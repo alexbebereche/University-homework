@@ -1,0 +1,246 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Design Charts</title>
+    <style>
+        canvas#canvas {
+            border: solid 1px black;
+        }
+
+        .div-tooltip {
+            opacity: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            color: firebrick;
+            background-color: rgb(100, 20, 20);
+            padding: 10px 20px;
+            margin: 20px;
+            z-index: 999999;
+        }
+    </style>
+    <script>
+        let canvas, context;
+        let values = [10, 50, 100, 90, 30];
+
+        function init() {
+            canvas = document.getElementById('canvas');
+            context = canvas.getContext('2d');
+            let sliders = document.getElementById('sliders');
+            let max = getMaximum(values);
+        
+            canvas.className = 'hover-reveal';
+            canvas.dataset.tooltip = 'PieChart';
+        
+            values.forEach((element, index) => {
+                let input = document.createElement('input');
+                let li = document.createElement('li');
+                let label = document.createElement('label');
+            
+                label.setAttribute('for', 'id' + index)
+                label.textContent = 'Value ' + index + ' ';
+                label.className = 'hover-reveal';
+                label.dataset.tooltip = 'label ' + index;
+                li.appendChild(label);
+            
+                input.setAttribute('id', 'id' + index);
+                input.setAttribute('type', 'range');
+                input.setAttribute('max', max);
+                input.value = element;
+                input.setAttribute('oninput', 'changeValue(' + index + ')');
+                input.className = 'hover-reveal';
+                input.dataset.tooltip = element;
+                li.appendChild(input);
+            
+                sliders.appendChild(li);
+            });
+        
+            let setupToolTip = () => {
+                tooltip = "";
+                toolTipDiv = document.querySelector('.div-tooltip');
+                toolTipElements = Array.from(document.querySelectorAll('.hover-reveal'));
+            }
+        
+            let displayToolTip = (ev, element) => {
+                tooltip = element.dataset.tooltip;
+                toolTipDiv.innerHTML = tooltip;
+                toolTipDiv.style.top = ev.pageY + 'px';
+                toolTipDiv.style.left = ev.pageX + 'px';
+                toolTipDiv.style.opacity = 1;
+            }
+        
+            setupToolTip();
+        
+            toolTipElements.forEach(element => {
+                // element.addEventListener('mouseenter', function (e) {
+                //     displayToolTip(e, this);
+                // })
+                element.addEventListener('mousemove', (ev) =>
+                displayToolTip(ev, element)
+                )
+                element.addEventListener('mouseleave', () =>
+                    toolTipDiv.style.opacity = 0
+                )
+            });
+        
+            makePieChart(300, 100, 90, values);
+        }
+
+        function getMaximum(array) {
+            return Math.max(...array);
+        }
+
+        function changeValue(index) {
+            let element = document.getElementById("id" + index);
+            let value = element.value;
+            values[parseInt(index)] = parseInt(value);
+            element.dataset.tooltip = value;
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            makePieChart(300, 100, 90, values);
+        }
+
+        function makePieChart(cx, cy, radius, array) {
+            context.restore();
+            let sum = array.reduce((a, b) => a + b, 0);
+            let startAngle = 0;
+            let endAngle = 0;
+            let percentage = 0;
+        
+            context.strokeStyle = 'grey';
+            array.forEach((element, index) => {
+                percentage = element / sum;
+                // let rcol = () => Math.floor(Math.random() * 255);
+                let red = (index * 100) % 255;
+                let green = (index * 50) % 255;
+                let blue = (index * 200) % 255;
+            
+                context.fillStyle = 'rgb(' + red + ', ' + green + ', ' + blue + ')';
+                endAngle = startAngle + Math.PI * 2 * percentage;
+                context.beginPath();
+                context.arc(cx, cy, radius, startAngle, endAngle);
+                context.lineTo(cx, cy);
+                startAngle = endAngle;
+                context.fill();
+                context.stroke();
+                context.closePath();
+                context.save();
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <form>
+        <input id="tbValues" type="text" value="10, 15, 4, 7" />
+        <input id="btnDrawBarChart" type="button" value="Draw Bar Chart" />
+    </form>
+
+    <canvas id="canvasBarChart" style="width: 500px; height: 500px; border:1px solid #000000";>
+        <!--#000000 is black-->
+        <!--also, need a canvas in order to draw graphics on a web page-->
+        If you see this message, your browser does not support the canvas element
+    </canvas>
+
+    <script>
+        
+        //experimenting with class in javascript
+        //i think best practice would be to write it in a javascript file
+        class BarChart {
+            //that method should always be added!
+            constructor(canvas) {
+                this.canvas = canvas;
+            }
+
+            // just a method
+            draw(values) {
+                let context = this.canvas.getContext('2d'); //2d => the creation of a CanvasRenderingContext2D object representing a two-dimensional rendering context
+                
+                context.save(); //saves the state of the canvas(pushes the crt state onto a stack)
+
+
+                let h = this.canvas.height;
+                let w = this.canvas.width / values.length;  //in order to distribute the width equally, proportionally
+
+                context.fillStyle = '#DEDEDE';
+                context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+                context.fillStyle = '#9370DB';  //"inside color"
+                context.strokeStyle = '#4B0082'; //"outside color"
+                context.lineWidth = 2;
+
+                //...spread operator
+
+               
+                /*Spread operator allows an iterable to expand in places where 0+ arguments are expected.
+                 * It is mostly used in the variable array where there is more than 1 values are expected.
+                 * It allows us the privilege to obtain a list of parameters from an array.
+                 * 
+                 * 
+                 * When … occurs in function call or alike, its called a spread operator.
+                 * Spread operator can be used in many cases, like when we want to expand, copy, concat,with math object.
+                 * */
+               
+
+                let maxValue = Math.max(...values);
+                let f = this.canvas.height / maxValue; //necessary, we need to compare it with the maximum values in our case
+
+
+                for (let i = 0; i < values.length; i++) {
+
+                    //the multiplications there mainly help with the spacing
+
+                    let rectWidth = w * 0.7;
+                    let rectHeight = values[i] * f * 0.9;
+                    let rectX = (i + 0.1) * w;
+                    let rectY = h - rectHeight; //drawing starts top-left
+
+                    //
+                    context.fillRect(rectX, rectY, rectWidth, rectHeight);
+                    context.strokeRect(rectX, rectY, rectWidth, rectHeight);
+
+                    //the strokeRect() method draws a rectangle(no fill).The default color of the stroke is black.
+                    //with fillRect, we fill the rectangle...
+                }
+
+
+                /*
+                 * The CanvasRenderingContext2D.restore() method of the Canvas 2D API restores the most recently saved canvas state by popping the top entry in the drawing state stack.
+                 * If there is no saved state, this method does nothing.
+                 */
+                context.restore();
+                
+            }
+        }
+
+
+
+        let canvasBarChart = document.getElementById('canvasBarChart');
+        let btnDrawBarChart = document.getElementById('btnDrawBarChart');
+        let barChart = new BarChart(canvasBarChart); //instantiate the class
+
+
+        /*
+         The EventTarget method addEventListener() sets up a function
+         that will be called whenever the specified event is delivered to the target.*/
+        //basically, when the button is clicked...
+        btnDrawBarChart.addEventListener('click', function () {
+            let tbValues = document.getElementById('tbValues');
+            let values = tbValues.value;
+
+            //The eval() function evaluates JavaScript code represented as a string. need this!
+            barChart.draw(eval('[' + values + ']'));
+        });
+
+        
+    </script>
+</body>
+<body onload="init()">
+    <canvas id="canvas" width="500" height="500"></canvas>
+    <ul id="sliders"></ul>
+    <div class="div-tooltip"></div>
+    <script src="script.js"></script>
+</body>
+</html>
