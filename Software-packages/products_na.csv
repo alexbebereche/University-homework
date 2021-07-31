@@ -1,0 +1,8 @@
+ID,NAME,PRICE,QUANTITY,CATEGORY,COLOR,WEIGHT_IN_KG
+1,Vans T-shirt,30,200,Clothes,Black,0.2
+2,Hoodie,80,150,Clothes,White,0.4
+3,Laptop HP i6006,2000,30,IT,Black,2.1
+4,SSD Kingstone,231,10,IT,Grey,0.3
+5,Logitech Mouse G502,150,114,IT,Black,0.3
+6,Football ball,100,15,Sport,White,0.4
+7,Fitness Course,150,100,Sport,,
